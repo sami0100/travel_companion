@@ -121,7 +121,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               onPressed: _saveTrip, // Call _saveTrip on button press
               child: Text('Save Trip'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade700, // Updated button color
+                backgroundColor: Colors.black12, // Updated button color
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
