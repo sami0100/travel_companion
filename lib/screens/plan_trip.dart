@@ -6,132 +6,188 @@ class PlanTripScreen extends StatefulWidget {
 }
 
 class _PlanTripScreenState extends State<PlanTripScreen> {
-  final TextEditingController _destinationController = TextEditingController();
-  final TextEditingController _startDateController = TextEditingController();
-  final TextEditingController _endDateController = TextEditingController();
-  final List<String> _activities = [];
+  final TextEditingController destinationController = TextEditingController();
+  final TextEditingController startDateController = TextEditingController();
+  final TextEditingController endDateController = TextEditingController();
+  final TextEditingController activityController = TextEditingController();
+  List<String> activities = [];
+  bool isTripSaved = false;
 
-  // Variable to hold trip details
-  String _tripDetails = '';
-
-  void _addActivity(String activity) {
-    if (activity.isNotEmpty) {
+  void _addActivity() {
+    if (activityController.text.isNotEmpty) {
       setState(() {
-        _activities.add(activity);
+        activities.add(activityController.text);
+        activityController.clear();
       });
     }
   }
 
   void _saveTrip() {
-    String destination = _destinationController.text;
-    String startDate = _startDateController.text;
-    String endDate = _endDateController.text;
+    if (destinationController.text.isNotEmpty &&
+        startDateController.text.isNotEmpty &&
+        endDateController.text.isNotEmpty) {
+      setState(() {
+        isTripSaved = true;
+      });
 
-    // Prepare trip details for display
-    setState(() {
-      _tripDetails = 'Destination: $destination\n'
-          'Start Date: $startDate\n'
-          'End Date: $endDate\n'
-          'Activities: ${_activities.join(', ')}';
-    });
-
-    // Clear the fields after saving
-    _destinationController.clear();
-    _startDateController.clear();
-    _endDateController.clear();
-    setState(() {
-      _activities.clear(); // Clear activities after saving
-    });
+      // Optionally, show a confirmation dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Trip Saved'),
+          content: Text(
+              'Destination: ${destinationController.text}\nStart Date: ${startDateController.text}\nEnd Date: ${endDateController.text}\nActivities: ${activities.join(', ')}'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Plan a Trip'),
-        elevation: 2,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
-              controller: _destinationController,
-              decoration: InputDecoration(
-                labelText: 'Destination',
-                filled: true,
-                fillColor: Colors.blue.shade50,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-            SizedBox(height: 15),
-            TextField(
-              controller: _startDateController,
-              decoration: InputDecoration(
-                labelText: 'Start Date (YYYY-MM-DD)',
-                filled: true,
-                fillColor: Colors.blue.shade50,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-            SizedBox(height: 15),
-            TextField(
-              controller: _endDateController,
-              decoration: InputDecoration(
-                labelText: 'End Date (YYYY-MM-DD)',
-                filled: true,
-                fillColor: Colors.blue.shade50,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text('Activities:', style: TextStyle(fontSize: 18)),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _activities.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    margin: EdgeInsets.symmetric(vertical: 8.0),
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: ListTile(
-                      title: Text(
-                        _activities[index],
-                        style: TextStyle(color: Colors.blue.shade900),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            TextField(
-              decoration: InputDecoration(labelText: 'Add Activity'),
-              onSubmitted: _addActivity,
-            ),
-            SizedBox(height: 15),
-            ElevatedButton(
-              onPressed: _saveTrip, // Call _saveTrip on button press
-              child: Text('Save Trip'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black12, // Updated button color
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text('Trip Details:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            Text(_tripDetails), // Display the saved trip details here
+            Icon(Icons.flight_takeoff),
+            SizedBox(width: 8),
+            Text('Plan a Trip'),
           ],
+        ),
+        backgroundColor: Colors.blueAccent,
+        elevation: 4,
+        centerTitle: true,
+      ),
+      body: Container(
+        padding: EdgeInsets.all(16.0),
+        color: Colors.blue.shade50,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: destinationController,
+                        decoration: InputDecoration(
+                          labelText: 'Destination',
+                          prefixIcon: Icon(Icons.place, color: Colors.blue),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: startDateController,
+                        decoration: InputDecoration(
+                          labelText: 'Start Date (YYYY-MM-DD)',
+                          prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextField(
+                        controller: endDateController,
+                        decoration: InputDecoration(
+                          labelText: 'End Date (YYYY-MM-DD)',
+                          prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text('Activities:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: activityController,
+                              decoration: InputDecoration(
+                                labelText: 'Add an activity',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.add_circle, color: Colors.blue),
+                            onPressed: _addActivity,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8.0,
+                        children: activities
+                            .map((activity) => Chip(
+                          label: Text(activity),
+                          deleteIcon: Icon(Icons.close),
+                          onDeleted: () {
+                            setState(() {
+                              activities.remove(activity);
+                            });
+                          },
+                        ))
+                            .toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _saveTrip,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text('Save Trip', style: TextStyle(fontSize: 18)),
+                ),
+              ),
+              if (isTripSaved) ...[
+                Divider(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text('Trip Details:', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                Text('Destination: ${destinationController.text}'),
+                Text('Start Date: ${startDateController.text}'),
+                Text('End Date: ${endDateController.text}'),
+                Text('Activities: ${activities.join(', ')}'),
+              ],
+            ],
+          ),
         ),
       ),
     );

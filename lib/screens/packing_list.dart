@@ -6,50 +6,105 @@ class PackingListScreen extends StatefulWidget {
 }
 
 class _PackingListScreenState extends State<PackingListScreen> {
-  final List<String> _packingList = []; // List to hold packing items
-  final TextEditingController _controller = TextEditingController(); // Controller for the text field
+  final TextEditingController itemController = TextEditingController();
+  List<String> packingItems = [];
 
   void _addItem() {
-    if (_controller.text.isNotEmpty) {
+    if (itemController.text.isNotEmpty) {
       setState(() {
-        _packingList.add(_controller.text); // Add item to the list
-        _controller.clear(); // Clear the text field
+        packingItems.add(itemController.text);
+        itemController.clear();
       });
     }
+  }
+
+  void _removeItem(int index) {
+    setState(() {
+      packingItems.removeAt(index);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Packing List'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.backpack),
+            SizedBox(width: 8),
+            Text('Packing List'),
+          ],
+        ),
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                labelText: 'Add Packing Item',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: _addItem, // Call _addItem on button press
+      body: Container(
+        color: Colors.blue.shade50,
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: itemController,
+                        decoration: InputDecoration(
+                          labelText: 'Add Packing Item',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.add_circle, color: Colors.blue),
+                      onPressed: _addItem,
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _packingList.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_packingList[index]),
-                );
-              },
+            SizedBox(height: 20),
+            Expanded(
+              child: packingItems.isEmpty
+                  ? Center(
+                child: Text(
+                  'No items added yet.',
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                ),
+              )
+                  : ListView.builder(
+                itemCount: packingItems.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ListTile(
+                      title: Text(packingItems[index]),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _removeItem(index),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
