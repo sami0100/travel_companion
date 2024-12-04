@@ -1,6 +1,6 @@
 # madproject
 
-A new Flutter project.
+Travel Companion App.
 
 ## Getting Started
 
