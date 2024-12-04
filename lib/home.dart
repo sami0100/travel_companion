@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth for logout functionality
 import 'screens/destination_explorer.dart';
 import 'screens/packing_list.dart';
 import 'screens/plan_trip.dart';
-
 import 'screens/grid_view_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,6 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase Auth instance for logout
   double _opacityExplore = 1.0;
   double _opacityPlan = 1.0;
   double _opacityPacking = 1.0;
@@ -43,10 +44,23 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => PackingListScreen()));
   }
 
+  void _logout() async {
+    await _auth.signOut();
+    Navigator.pushReplacementNamed(context, '/login');
+  }
+
   void _onChipTap(String category) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Category Selected'),
         content: Text('You tapped on $category'),
+        actions: [
+          TextButton(
+            child: Text('OK'),
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+        ],
       ),
     );
   }
@@ -56,28 +70,32 @@ class _HomeScreenState extends State<HomeScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.blue.shade700, // Ensure a background color that contrasts with the icon
+          backgroundColor: Colors.blue.shade700,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min, // Adjust size to fit content
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.flight_takeoff, color: Colors.white), // White color for better contrast
+              Icon(Icons.flight_takeoff, color: Colors.white),
               SizedBox(width: 10),
               Text(
                 'Travel Companion',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white, // Ensure the text is also visible
+                  color: Colors.white,
                 ),
               ),
             ],
           ),
           centerTitle: true,
           elevation: 2,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.logout, color: Colors.white),
+              onPressed: _logout,
+            ),
+          ],
         ),
-
-
         body: Container(
           width: double.infinity,
           decoration: BoxDecoration(
